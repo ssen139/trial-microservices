@@ -4,5 +4,5 @@ COPY pom.xml /usr/src/trial-eureka-app
 RUN mvn -f /usr/src/trial-eureka-app/pom.xml clean package
 FROM gcr.io/distroless/java
 COPY --from=build /usr/src/trial-eureka-app/target/trial-eureka-app-0.0.1-SNAPSHOT.jar /usr/trial-eureka-app/trial-eureka-app-0.0.1-SNAPSHOT.jar
-EXPOSE 8010
+EXPOSE 8001
 ENTRYPOINT ["java","-jar","/usr/trial-eureka-app/trial-eureka-app-0.0.1-SNAPSHOT.jar"]

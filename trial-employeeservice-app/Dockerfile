@@ -1,7 +1,8 @@
-FROM openjdk:8-jdk-alpine
-MAINTAINER Sourav Sen <ssen@yodlee.com>
-VOLUME /tmp
+FROM maven:3.5-jdk-8 AS build
+COPY src /usr/src/trial-employeeservice-app/src
+COPY pom.xml /usr/src/trial-employeeservice-app
+RUN mvn -f /usr/src/trial-employeeservice-app/pom.xml clean package
+FROM gcr.io/distroless/java
+COPY --from=build /usr/src/trial-employeeservice-app/target/trial-employeeservice-app-0.0.1-SNAPSHOT.jar /usr/trial-employeeservice-app/trial-employeeservice-app-0.0.1-SNAPSHOT.jar
 EXPOSE 8010
-ARG JAR_FILE=target/rest-service-1.0.0.jar
-ADD ${JAR_FILE} rest-service-1.0.0.jar
-ENTRYPOINT ["java","-jar","/rest-service-1.0.0.jar"]
+ENTRYPOINT ["java","-jar","/usr/trial-employeeservice-app/trial-employeeservice-app-0.0.1-SNAPSHOT.jar"]

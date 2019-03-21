@@ -1,13 +1,8 @@
-FROM openjdk:8-jdk-alpine
-MAINTAINER Sourav Sen <ssen@yodlee.com>
-
-FROM maven:3.5-jdk-8-alpine
-WORKDIR /app
-COPY --from=0 D:\Java\workspace\microserviceProjects\trial-zuul-app /app
-RUN mvn install
-
-VOLUME /tmp
-EXPOSE 8010
-ARG JAR_FILE=target/rest-service-1.0.0.jar
-ADD ${JAR_FILE} rest-service-1.0.0.jar
-ENTRYPOINT ["java","-jar","/rest-service-1.0.0.jar"]
+FROM maven:3.5-jdk-8 AS build
+COPY src /usr/src/trial-zuul-app/src
+COPY pom.xml /usr/src/trial-zuul-app
+RUN mvn -f /usr/src/trial-zuul-app/pom.xml clean package
+FROM gcr.io/distroless/java
+COPY --from=build /usr/src/trial-zuul-app/target/trial-zuul-app-0.0.1-SNAPSHOT.jar /usr/trial-zuul-app/trial-zuul-app-0.0.1-SNAPSHOT.jar
+EXPOSE 8080
+ENTRYPOINT ["java","-jar","/usr/trial-zuul-app/trial-zuul-app-0.0.1-SNAPSHOT.jar"]
