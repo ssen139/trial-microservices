@@ -1,7 +1,8 @@
-FROM openjdk:8-jdk-alpine
-MAINTAINER Sourav Sen <ssen@yodlee.com>
-VOLUME /tmp
+FROM maven:3.5-jdk-8 AS build
+COPY src /usr/src/trial-eureka-app/src
+COPY pom.xml /usr/src/trial-eureka-app
+RUN mvn -f /usr/src/trial-eureka-app/pom.xml clean package
+FROM gcr.io/distroless/java
+COPY --from=build /usr/src/trial-eureka-app/target/trial-eureka-app-0.0.1-SNAPSHOT.jar /usr/trial-eureka-app/trial-eureka-app-0.0.1-SNAPSHOT.jar
 EXPOSE 8010
-ARG JAR_FILE=target/rest-service-1.0.0.jar
-ADD ${JAR_FILE} rest-service-1.0.0.jar
-ENTRYPOINT ["java","-jar","/rest-service-1.0.0.jar"]
+ENTRYPOINT ["java","-jar","/usr/trial-eureka-app/trial-eureka-app-0.0.1-SNAPSHOT.jar"]
